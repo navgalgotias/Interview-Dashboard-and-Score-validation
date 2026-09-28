@@ -1,0 +1,878 @@
+<title>Support Trainee Scorecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#EDF1F4; --surface:#FFFFFF; --surface-2:#E4EAEF; --line:#D0D9E0;
+  --ink:#0F1E2E; --muted:#56677A; --accent:#0A7680; --accent-strong:#075E66; --accent-ink:#FFFFFF; --accent-soft:#D3EBED;
+  --hl:#C97A0E; --hl-soft:#FBEBD2;
+  --good:#1E7A4C; --good-soft:#DCF0E4; --warn:#9A6400; --warn-soft:#F8EACB; --bad:#B3352E; --bad-soft:#F6DDDA;
+  --band:#0F2438; --band-2:#163250; --band-ink:#EAF2F8; --band-muted:#9BB0C4; --band-line:#2A4C6C; --band-accent:#5CCFD6;
+  --band-good:#6BD49B; --band-warn:#F2C063; --band-bad:#F58A80;
+  --shadow:0 1px 2px rgb(15 30 46 / .06), 0 6px 20px rgb(15 30 46 / .06);
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0B1219; --surface:#121C26; --surface-2:#1A2733; --line:#273645;
+    --ink:#E4ECF3; --muted:#8FA2B4; --accent:#4FC3CC; --accent-strong:#7AD6DD; --accent-ink:#06222A; --accent-soft:#143840;
+    --hl:#F0B04F; --hl-soft:#3A2B12;
+    --good:#5CC48E; --good-soft:#16352A; --warn:#E3AE4A; --warn-soft:#3A2E14; --bad:#F07A70; --bad-soft:#3E1D1B;
+    --band:#0F2236; --band-2:#16304A; --band-line:#24425F;
+    --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0B1219; --surface:#121C26; --surface-2:#1A2733; --line:#273645;
+  --ink:#E4ECF3; --muted:#8FA2B4; --accent:#4FC3CC; --accent-strong:#7AD6DD; --accent-ink:#06222A; --accent-soft:#143840;
+  --hl:#F0B04F; --hl-soft:#3A2B12;
+  --good:#5CC48E; --good-soft:#16352A; --warn:#E3AE4A; --warn-soft:#3A2E14; --bad:#F07A70; --bad-soft:#3E1D1B;
+  --band:#0F2236; --band-2:#16304A; --band-line:#24425F;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:20px 80px}
+@media (max-width:520px){.wrap{padding-inline:16px}}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--hl);outline-offset:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+kbd{font-family:var(--mono);font-size:11px;padding:1px 6px;border-radius:4px;border:1px solid var(--line);border-bottom-width:2px;background:var(--surface);color:var(--ink)}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:17px}
+.brand svg{flex:none}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px}
+.tab{border:0;background:transparent;padding:8px 16px;border-radius:9px;font-weight:600;color:var(--muted);display:flex;gap:6px;align-items:center;transition:background .15s,color .15s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.count{font-family:var(--mono);font-size:12px;background:var(--accent-soft);color:var(--accent-strong);padding:0 7px;border-radius:999px}
+
+/* ---------- hero band ---------- */
+.hero{background:radial-gradient(120% 140% at 100% 0%, var(--band-2) 0%, var(--band) 55%);color:var(--band-ink);border-radius:20px;padding:26px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgb(255 255 255 / .05) 1px, transparent 1px);background-size:18px 18px;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--band-accent);font-weight:600}
+.hero h1{font-size:clamp(28px,4.4vw,44px);font-weight:800;letter-spacing:-.01em;margin-top:6px}
+.hero .lede{color:var(--band-muted);margin:8px 0 18px;max-width:52ch}
+.cand{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+@media (max-width:520px){.cand{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field span{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--band-muted);font-weight:600}
+.field input,.field select{background:transparent;border:0;border-bottom:1.5px solid var(--band-line);color:var(--band-ink);padding:6px 0;border-radius:0;min-width:0;color-scheme:dark;transition:border-color .15s}
+.field input::placeholder{color:rgb(155 176 196 / .6)}
+.field input:focus,.field select:focus{outline:none;border-bottom-color:var(--band-accent)}
+.field select option{background:var(--band);color:var(--band-ink)}
+.field.wide{grid-column:1/-1}
+.field.wide input{font-family:var(--display);font-size:22px;font-weight:600}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center}
+.hbtn{border:1.5px solid var(--band-line);background:transparent;color:var(--band-ink);padding:9px 16px;border-radius:10px;font-weight:600;transition:border-color .15s,background .15s,transform .1s}
+.hbtn:hover{border-color:var(--band-accent)}
+.hbtn:active{transform:translateY(1px)}
+.hbtn.primary{background:var(--band-accent);border-color:var(--band-accent);color:#062A2E}
+.hbtn.primary:hover{background:#7FDDE2}
+.hbtn.danger{border-color:var(--band-bad);color:var(--band-bad)}
+.hstatus{font-size:13px;color:var(--band-muted)}
+
+.scorebox{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+@media (max-width:520px){.scorebox{grid-template-columns:1fr;justify-items:center}}
+.ring{position:relative;width:176px;height:176px}
+.ring svg{display:block}
+.ring .arc{transition:stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1),stroke .3s}
+.ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .pct{font-family:var(--display);font-size:44px;font-weight:800;line-height:1}
+.ring .pct small{font-size:20px;font-weight:600;color:var(--band-muted)}
+.ring .raw{font-family:var(--mono);font-size:13px;color:var(--band-muted);margin-top:4px}
+.verdict{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-weight:600;font-size:14px;background:rgb(255 255 255 / .08);color:var(--band-muted);transition:background .3s,color .3s}
+.verdict .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.verdict.good{background:rgb(107 212 155 / .15);color:var(--band-good)}
+.verdict.warn{background:rgb(242 192 99 / .15);color:var(--band-warn)}
+.verdict.bad{background:rgb(245 138 128 / .15);color:var(--band-bad)}
+.stats{display:flex;flex-direction:column;gap:10px}
+.stat-row{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--band-muted);border-bottom:1px dashed var(--band-line);padding-bottom:6px}
+.stat-row b{color:var(--band-ink);font-family:var(--mono);font-weight:500}
+.radarwrap{margin-top:8px;position:relative}
+.radarwrap svg{width:100%;max-width:420px;height:auto;display:block;margin:0 auto;overflow:visible}
+.radar-dot{cursor:default}
+.tip{position:absolute;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;padding:6px 10px;font-size:12.5px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));z-index:5}
+.tip b{font-family:var(--mono);font-weight:600}
+
+/* ---------- section nav ---------- */
+.navbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:18px -20px 0;padding:10px 20px;background:color-mix(in srgb, var(--ground) 88%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.navbar.stuck{border-bottom-color:var(--line)}
+@media (max-width:520px){.navbar{margin-inline:-16px;padding-inline:16px}}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:grid;grid-template-columns:auto auto;gap:2px 10px;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:7px 12px 8px;text-align:left;min-width:132px;transition:border-color .15s,background .15s,transform .1s}
+.chip:hover{border-color:var(--accent)}
+.chip.on{border-color:var(--accent);background:var(--accent-soft)}
+.chip .cn{font-weight:600;font-size:13px}
+.chip .cc{font-family:var(--mono);font-size:12px;color:var(--muted);justify-self:end}
+.chip .cb{grid-column:1/-1;height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}
+.chip .cb i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .35s}
+.chip.done .cc{color:var(--good)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;margin-top:10px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tbtn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 12px;font-size:13.5px;font-weight:600;display:inline-flex;gap:6px;align-items:center;transition:border-color .15s,background .15s}
+.tbtn:hover{border-color:var(--accent)}
+.tbtn[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.keys{font-size:12.5px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:760px){.keys{display:none}}
+.mini{font-size:13px;display:flex;gap:8px;align-items:center}
+.mini .mp{font-family:var(--mono);font-weight:600}
+.mpill{padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--muted)}
+.mpill.good{background:var(--good-soft);color:var(--good)} .mpill.warn{background:var(--warn-soft);color:var(--warn)} .mpill.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* ---------- questions ---------- */
+.sec{margin-top:28px;scroll-margin-top:150px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
+.sec-head h2{font-size:22px;font-weight:700}
+.sec-head .sub{font-size:13px;color:var(--muted)}
+.sec-score{font-family:var(--mono);font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.sec-score b{color:var(--ink);font-size:18px;font-weight:600}
+.qlist{display:grid;gap:10px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;scroll-margin-top:170px;transition:border-color .2s,box-shadow .2s,transform .2s}
+.q:hover{border-color:color-mix(in srgb, var(--accent) 40%, var(--line))}
+.q.active{border-color:var(--hl);box-shadow:0 0 0 3px var(--hl-soft)}
+.qn{font-family:var(--mono);font-weight:600;font-size:13px;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);transition:background .25s,color .25s}
+.q[data-tone="good"] .qn{background:var(--good-soft);color:var(--good)}
+.q[data-tone="warn"] .qn{background:var(--warn-soft);color:var(--warn)}
+.q[data-tone="bad"] .qn{background:var(--bad-soft);color:var(--bad)}
+.q[data-tone="mid"] .qn{background:var(--accent-soft);color:var(--accent-strong)}
+.qbody{min-width:0;display:grid;gap:10px}
+.qcat{display:none;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.qt{font-family:var(--body);font-size:16px;font-weight:500;line-height:1.45}
+.qrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.scale{display:flex;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface-2)}
+.scale button{width:44px;height:38px;border:0;border-right:1px solid var(--line);background:var(--surface);font-family:var(--mono);font-weight:600;font-size:15px;color:var(--muted);transition:background .15s,color .15s}
+.scale button:last-child{border-right:0}
+.scale button:hover{background:var(--surface-2);color:var(--ink)}
+.scale button[aria-checked="true"]{color:#fff}
+.scale button[aria-checked="true"][data-v="0"],.scale button[aria-checked="true"][data-v="1"]{background:var(--bad)}
+.scale button[aria-checked="true"][data-v="2"]{background:var(--warn)}
+.scale button[aria-checked="true"][data-v="3"]{background:var(--accent)}
+.scale button[aria-checked="true"][data-v="4"],.scale button[aria-checked="true"][data-v="5"]{background:var(--good)}
+:root[data-theme="dark"] .scale button[aria-checked="true"]{color:#0B1219}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .scale button[aria-checked="true"]{color:#0B1219}}
+.pop{animation:pop .28s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.readout{font-size:13.5px;color:var(--muted);min-width:9ch}
+.readout b{color:var(--ink);font-weight:600}
+.qlinks{display:flex;gap:4px;margin-left:auto}
+.ghost{border:0;background:transparent;color:var(--accent-strong);font-size:13px;font-weight:600;padding:5px 8px;border-radius:7px;display:inline-flex;gap:5px;align-items:center}
+.ghost:hover{background:var(--accent-soft)}
+.ghost.has{color:var(--hl)}
+.guide{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--ink)}
+.guide .label{color:var(--accent-strong);display:block;margin-bottom:2px}
+.note{width:100%;min-height:64px;border:1px solid var(--line);background:var(--ground);border-radius:10px;padding:9px 11px;resize:vertical;font-size:14px}
+@media (max-width:520px){
+  .q{grid-template-columns:1fr;padding:14px}
+  .qn{width:auto;height:auto;justify-self:start;padding:2px 8px;border-radius:6px}
+  .scale{width:100%}.scale button{flex:1;width:auto}
+  .qlinks{margin-left:0}
+}
+
+/* focus mode */
+.focusbar{display:none}
+body.focus .sec{display:none}
+body.focus .sec.cur{display:block}
+body.focus .sec.cur .sec-head{display:none}
+body.focus .q:not(.active){display:none}
+body.focus .q{padding:28px;grid-template-columns:1fr;border-radius:18px;box-shadow:var(--shadow);min-height:320px;align-content:start}
+body.focus .q.active{box-shadow:var(--shadow);border-color:var(--line)}
+body.focus .qn{justify-self:start;width:auto;height:auto;padding:3px 10px;border-radius:7px}
+body.focus .qcat{display:block}
+body.focus .qt{font-family:var(--display);font-size:clamp(22px,3vw,30px);font-weight:600;line-height:1.25;margin:4px 0 8px}
+body.focus .scale button{width:64px;height:52px;font-size:18px}
+@media (max-width:520px){body.focus .scale button{width:auto;height:48px}body.focus .q{padding:20px}}
+body.focus .focusbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+body.focus .remarks{display:none}
+.fprog{flex:1;min-width:140px;display:grid;gap:6px;text-align:center;font-size:13px;color:var(--muted)}
+.fprog .bar{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.fprog .bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.fbtn{border:1px solid var(--line);background:var(--surface);padding:10px 18px;border-radius:10px;font-weight:600}
+.fbtn:hover{border-color:var(--accent)}
+.fbtn:disabled{opacity:.4;cursor:default}
+.slide-in{animation:slidein .28s ease-out}
+@keyframes slidein{from{opacity:.2;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.remarks{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:10px}
+.remarks h2{font-size:20px}
+.remarks textarea{border:1px solid var(--line);background:var(--ground);border-radius:10px;padding:10px 12px;min-height:110px;resize:vertical;width:100%}
+.remarks .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:10px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+
+/* ---------- dashboard ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi .v{font-family:var(--display);font-size:34px;font-weight:800;line-height:1.1;margin-top:6px}
+.kpi .v.good{color:var(--good)} .kpi .v.warn{color:var(--warn)} .kpi .v.bad{color:var(--bad)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.dist{display:flex;gap:2px;height:14px;border-radius:7px;overflow:hidden;background:var(--surface-2);margin:10px 0 8px}
+.dist i{display:block;height:100%;transition:width .4s}
+.dist i.good{background:var(--good)} .dist i.warn{background:var(--warn)} .dist i.bad{background:var(--bad)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.filters .l{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;min-width:0;width:220px;max-width:100%}
+.seg{display:flex;gap:4px;background:var(--surface-2);padding:3px;border-radius:10px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.sel{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 10px}
+.tablebox{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--surface-2)}
+td.r,th.r{text-align:right}
+tbody tr.row{cursor:pointer;transition:background .15s}
+tbody tr.row:hover{background:color-mix(in srgb, var(--accent-soft) 45%, transparent)}
+tbody tr.row.open{background:var(--accent-soft)}
+.cname{font-weight:600}
+.pbar{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.pbar .t{width:70px;height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.pbar .t i{display:block;height:100%;border-radius:3px}
+.pbar .t i.good{background:var(--good)} .pbar .t i.warn{background:var(--warn)} .pbar .t i.bad{background:var(--bad)}
+.minibars{display:flex;gap:2px;align-items:flex-end;height:24px}
+.minibars i{width:8px;background:var(--accent);border-radius:2px 2px 0 0}
+.detail td{background:var(--ground);padding:18px}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px}
+@media (max-width:760px){.dgrid{grid-template-columns:1fr}}
+.cmp{display:grid;gap:10px}
+.cmp-row{display:grid;grid-template-columns:170px minmax(0,1fr) 52px;gap:10px;align-items:center;font-size:13.5px}
+.cmp-track{position:relative;height:10px;background:var(--surface-2);border-radius:5px}
+.cmp-track i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:5px}
+.cmp-track b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);border-radius:1px}
+.cmp-row .v{font-family:var(--mono);text-align:right}
+.dactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);display:grid;gap:12px;justify-items:center}
+.store-note{font-size:13px;color:var(--muted)}
+
+/* toast */
+.toasts{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:8px;z-index:50;width:max-content;max-width:calc(100% - 32px)}
+.toast{background:var(--ink);color:var(--ground);padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:var(--shadow);animation:toast .25s ease-out}
+.toast.bad{background:var(--bad);color:#fff}
+@keyframes toast{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="var(--accent)"/><path d="M8 15a6 6 0 0 1 12 0v3a2 2 0 0 1-2 2h-1v-6h3M8 14h3v6h-1a2 2 0 0 1-2-2z" fill="none" stroke="var(--accent-ink)" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      Support Trainee Scorecard
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-sheet" aria-selected="true">Score sheet</button>
+      <button class="tab" role="tab" id="tab-dash" aria-selected="false">Candidates <span class="count" id="cand-count">0</span></button>
+    </div>
+  </div>
+
+  <!-- ================= SCORE SHEET ================= -->
+  <section id="view-sheet">
+    <div class="hero">
+      <form id="cand-form" autocomplete="off">
+        <div class="eyebrow">Technical Support Trainee · 52 questions · 7 sections</div>
+        <h1>Interview score sheet</h1>
+        <p class="lede">Rate each answer from 0 to 5. The score, section radar and hiring verdict update as you go.</p>
+        <div class="cand">
+          <label class="field wide"><span>Candidate name</span><input id="f-name" placeholder="Type the candidate's name"></label>
+          <label class="field"><span>Interviewer</span><input id="f-interviewer" placeholder="Your name"></label>
+          <label class="field"><span>Interview date</span><input id="f-date" type="date"></label>
+          <label class="field"><span>Mode</span><select id="f-mode"><option>In person</option><option>Phone</option><option>Video call</option></select></label>
+          <label class="field"><span>Shift preference</span><select id="f-shift"><option>Any shift</option><option>Day only</option><option>Rotational</option><option>Night</option></select></label>
+        </div>
+        <div class="hero-actions">
+          <button type="submit" class="hbtn primary" id="btn-save">Save interview</button>
+          <button type="button" class="hbtn" id="btn-new">New interview</button>
+          <span class="hstatus" id="save-status"></span>
+        </div>
+      </form>
+
+      <div>
+        <div class="scorebox">
+          <div class="ring">
+            <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
+              <circle cx="88" cy="88" r="72" fill="none" stroke="var(--band-line)" stroke-width="12"/>
+              <circle id="ring-arc" class="arc" cx="88" cy="88" r="72" fill="none" stroke="var(--band-accent)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 88 88)" stroke-dasharray="452.39" stroke-dashoffset="452.39"/>
+              <line x1="88" y1="8" x2="88" y2="22" stroke="var(--band-muted)" stroke-width="1.5" transform="rotate(216 88 88)"/>
+              <line x1="88" y1="8" x2="88" y2="22" stroke="var(--band-muted)" stroke-width="1.5" transform="rotate(270 88 88)"/>
+            </svg>
+            <div class="center" aria-live="polite">
+              <div class="pct"><span id="s-pct">0</span><small>%</small></div>
+              <div class="raw" id="s-raw">0 / 0 pts</div>
+            </div>
+          </div>
+          <div class="stats">
+            <span class="verdict" id="s-verdict"><span class="dot"></span><span>Not scored yet</span></span>
+            <div class="stat-row"><span>Questions rated</span><b id="s-rated">0 / 52</b></div>
+            <div class="stat-row"><span>Strongest section</span><b id="s-best">–</b></div>
+            <div class="stat-row"><span>Weak areas (&lt;50%)</span><b id="s-weak">–</b></div>
+            <div style="font-size:12px;color:var(--band-muted)">Ticks on the ring mark 60% (next round) and 75% (recommended).</div>
+          </div>
+        </div>
+        <div class="radarwrap" id="radarwrap"><svg id="radar" viewBox="-195 -118 390 236" role="img" aria-label="Section scores radar"></svg><div class="tip" id="tip" hidden></div></div>
+      </div>
+    </div>
+
+    <div class="navbar" id="navbar">
+      <div class="chips" id="chips"></div>
+      <div class="toolbar">
+        <div class="tools">
+          <button class="tbtn" id="btn-focus" aria-pressed="false" title="Show one question at a time (F)">
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 4V1h3M10 1h3v3M13 10v3h-3M4 13H1v-3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Focus mode</button>
+          <button class="tbtn" id="btn-guides" aria-pressed="false" title="Show every answer guide">Show all answer guides</button>
+          <button class="tbtn" id="btn-next-unrated">Next unrated</button>
+        </div>
+        <div class="keys"><span><kbd>0</kbd>–<kbd>5</kbd> rate</span><span><kbd>J</kbd>/<kbd>K</kbd> move</span><span><kbd>F</kbd> focus</span><span><kbd>G</kbd> guide</span><span><kbd>N</kbd> note</span></div>
+        <div class="mini"><span class="mp" id="m-pct">0%</span><span class="mpill" id="m-verdict">Not scored</span></div>
+      </div>
+    </div>
+
+    <main id="questions"></main>
+
+    <div class="focusbar">
+      <button class="fbtn" id="f-prev">← Previous</button>
+      <div class="fprog"><span id="f-label">Question 1 of 52</span><div class="bar"><i id="f-bar" style="width:0%"></i></div></div>
+      <button class="fbtn" id="f-next">Next →</button>
+    </div>
+
+    <section class="remarks">
+      <h2>Interviewer remarks</h2>
+      <textarea id="f-remarks" placeholder="Overall impression, communication, attitude and any follow-up actions"></textarea>
+      <div class="row">
+        <button class="btn primary" id="btn-save-2">Save interview</button>
+        <span class="store-note" id="save-status-2"></span>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="view-dash" hidden>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Interviewed</div><div class="v num" id="k-count">0</div></div>
+      <div class="kpi"><div class="label">Average score</div><div class="v num" id="k-avg">–</div></div>
+      <div class="kpi"><div class="label">Recommended</div><div class="v num good" id="k-rec">0</div></div>
+      <div class="kpi"><div class="label">Next round</div><div class="v num warn" id="k-next">0</div></div>
+      <div class="kpi"><div class="label">Not recommended</div><div class="v num bad" id="k-rej">0</div></div>
+    </div>
+    <div class="panel">
+      <div class="label">Verdict split</div>
+      <div class="dist" id="dist"></div>
+      <div class="legend" id="dist-legend"></div>
+    </div>
+    <div class="filters">
+      <div class="l">
+        <input class="search" id="q-search" type="search" placeholder="Search candidate or interviewer">
+        <div class="seg" id="q-filter">
+          <button aria-pressed="true" data-f="all">All</button>
+          <button aria-pressed="false" data-f="Recommended">Recommended</button>
+          <button aria-pressed="false" data-f="Next round">Next round</button>
+          <button aria-pressed="false" data-f="Not recommended">Not recommended</button>
+        </div>
+      </div>
+      <div class="l">
+        <select class="sel" id="q-sort" aria-label="Sort">
+          <option value="date">Newest first</option><option value="score">Highest score</option><option value="name">Name A–Z</option>
+        </select>
+        <button class="btn" id="btn-csv" hidden>Export CSV</button>
+      </div>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Candidate</th><th>Date</th><th>Interviewer</th><th class="r">Points</th><th class="r">Score</th><th>Sections</th><th>Verdict</th></tr></thead>
+        <tbody id="dash-body"></tbody>
+      </table>
+    </div>
+    <p class="store-note" id="store-note" style="margin-top:10px"></p>
+  </section>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+const CATS = [
+  {id:"intro", name:"Introduction & Communication", short:"Intro"},
+  {id:"comp",  name:"Basic Computer Knowledge",     short:"Computer"},
+  {id:"trbl",  name:"Basic Troubleshooting",        short:"Troubleshoot"},
+  {id:"cust",  name:"Customer Handling",            short:"Customer"},
+  {id:"logic", name:"Logical Thinking",             short:"Logic"},
+  {id:"scen",  name:"Scenario-Based",               short:"Scenario"},
+  {id:"email", name:"Email & Documentation",        short:"Email & Docs"}
+];
+const Q = [
+  ["intro","Tell me about yourself.","Short, structured answer: education, relevant skills, and why that fits a support role. Stays under two minutes."],
+  ["intro","Why do you want to join Technical Support?","Enjoys solving problems and helping people, wants to learn technology. A specific reason, not a generic one."],
+  ["intro","What do you understand by the role of a Technical Support Executive?","First point of contact; diagnoses and resolves issues, logs tickets, escalates when needed, follows up, keeps the customer satisfied."],
+  ["intro","What are your strengths and weaknesses?","A real strength backed by an example; an honest weakness with the steps being taken to improve it."],
+  ["intro","How comfortable are you speaking with customers over the phone or email?","Confident and polite; mentions active listening, clear speech and clear written English."],
+  ["intro","Are you comfortable working in rotational shifts or night shifts?","A clear answer. Understands that support runs around the clock and shows flexibility."],
+  ["intro","How do you handle pressure when multiple tasks are assigned to you?","Prioritises by urgency and impact, makes a list, stays calm, communicates and asks for help when needed."],
+  ["comp","What is the difference between hardware and software?","Hardware is the physical parts (keyboard, CPU); software is the programs and instructions (Windows, Chrome)."],
+  ["comp","What is an operating system? Can you name one?","Software that manages the hardware and runs applications. Names Windows, macOS, Linux or Android."],
+  ["comp","What is the difference between RAM and a hard disk?","RAM is fast, temporary working memory cleared on shutdown; the hard disk/SSD stores data permanently."],
+  ["comp","What is the difference between a web browser and a search engine?","A browser (Chrome, Edge) is the app that opens websites; a search engine (Google, Bing) is a website that finds information."],
+  ["comp","What is the difference between a file and a folder?","A file holds data (a document, an image); a folder organises and contains files."],
+  ["comp","What is the purpose of Microsoft Excel?","Spreadsheets for data entry, calculations and formulas, sorting, filtering and charts."],
+  ["comp","What is the difference between Wi-Fi and the internet?","Wi-Fi is the local wireless link to a router; the internet is the global network supplied by the ISP."],
+  ["comp","What is a screenshot, and how do you take one?","An image of the screen. PrtScn, Win+Shift+S or Snipping Tool; Cmd+Shift+4 on Mac."],
+  ["comp","What would you do if your computer stopped responding?","Wait briefly, open Task Manager (Ctrl+Shift+Esc) and end the stuck task, then restart if needed."],
+  ["comp","What is the purpose of restarting a computer?","Clears memory, stops stuck processes, applies updates and fixes temporary glitches."],
+  ["trbl","What would you do if your computer was not turning on?","Checks the power cable and socket, charger or battery, power button, lights or beeps, monitor connection; escalates if still dead."],
+  ["trbl","What would you do if you could not connect to the internet?","Checks Wi-Fi or cable, tries another device, restarts the router, checks airplane mode, runs the network troubleshooter, contacts the ISP."],
+  ["trbl","What would you do if an application was not opening?","Restarts the app, checks Task Manager, restarts the PC, runs as admin, updates or reinstalls, notes any error."],
+  ["trbl","What would you do if your printer was not working?","Checks power, cable or Wi-Fi, paper, ink and jams, default printer, print queue and drivers."],
+  ["trbl","What would you do if you forgot your login password?","Uses Forgot Password or asks the admin/IT to reset after identity check. Never shares passwords."],
+  ["trbl","What would you do if a website was not loading?","Checks the internet, tries other sites, refreshes, checks the URL, clears cache, tries another browser, checks if the site is down."],
+  ["trbl","What would you do if your computer was running very slowly?","Closes unused programs, checks Task Manager, restarts, frees disk space, runs updates and a malware scan, trims startup apps."],
+  ["trbl","What would you do if you received an error message on the screen?","Reads and notes the exact message or code, takes a screenshot, searches the knowledge base, retries, escalates with the details."],
+  ["trbl","What would you do if a customer said they could not log in to the application?","Confirms username, Caps Lock and password; checks for a locked account; resets password; checks service status; clears cache."],
+  ["trbl","Why is it important to collect details before trying to fix an issue?","Finds the real problem, avoids wrong fixes, saves time, helps reproduce the issue and makes escalation smooth."],
+  ["cust","How would you handle an angry customer?","Stays calm, listens without interrupting, empathises, apologises, gives a clear action plan and follows up."],
+  ["cust","What would you do if you did not know the answer to a customer's question?","Is honest, never guesses, checks the knowledge base or a senior, gives a time frame and follows up."],
+  ["cust","How would you explain a technical issue to someone unfamiliar with computers?","Plain words, simple analogies, one step at a time, checks understanding, stays patient."],
+  ["cust","What would you do if a customer repeatedly reported the same issue?","Reviews ticket history, looks for the root cause instead of repeating the same fix, escalates and documents."],
+  ["cust","How would you handle a customer who says the application is not working but provides no details?","Asks open questions: what happens, when it started, any error, what changed, which device. Requests a screenshot or screen share."],
+  ["cust","Why is it important to listen carefully to a customer?","Understands the real issue, avoids assumptions, shows respect, resolves faster and builds trust."],
+  ["cust","How would you communicate a delay in resolving an issue?","Informs proactively, gives an honest reason and a new time estimate, apologises and sends regular updates."],
+  ["cust","What would you do if a customer demanded immediate resolution but another team was needed?","Empathises, explains the process, escalates with urgency and full details, sets expectations, follows up."],
+  ["logic","If five customers report the same issue, what would you do first?","Suspects a common cause or outage, checks system status, informs the team lead, links the tickets and sends a common update."],
+  ["logic","If you have three tickets with different priorities, how would you decide which to handle first?","Business impact and urgency first, number of users affected, SLA deadlines; keeps others informed."],
+  ["logic","If an issue occurs repeatedly, how would you investigate it?","Looks for a pattern (time, user, device), checks logs, reproduces the issue, finds the root cause, documents it."],
+  ["logic","What would you do if your first solution did not work?","Stays calm, rechecks the information, tries the next step, researches, escalates, keeps the customer updated."],
+  ["logic","How would you identify whether an issue is related to the computer, internet, or application?","Isolates step by step: other websites, other apps, another device or user, another network."],
+  ["logic","If a customer reports an issue but you cannot reproduce it, what would you do?","Collects exact steps, environment, screenshots or a recording and logs; uses screen share; monitors and escalates."],
+  ["logic","Why is it important to document the steps taken to resolve an issue?","Future reference and knowledge base, smooth handover, avoids repeated work, supports reporting."],
+  ["scen","A customer says, 'I am unable to log in to the application.' What would you do?","Greets, verifies identity, checks credentials and Caps Lock, resets password or unlocks account, checks for outages, confirms and documents."],
+  ["scen","A restaurant manager reports that the application is not working during business hours. How would you handle it?","Treats it as high priority, understands the impact on service, runs quick checks, offers a workaround, escalates fast, updates often."],
+  ["scen","A customer is angry because their issue has not been resolved for two hours. What would you say?","Apologises, acknowledges the frustration, gives the current status, a clear next step and a time, and owns the follow-up."],
+  ["scen","You have five open tickets, and one customer says their entire business operation is affected. What would you do?","Takes the business-down ticket first, tells the others when to expect help, escalates if needed."],
+  ["scen","You resolved an issue, but the same customer reports it again the next day. What would you do?","Apologises, reviews earlier notes, finds the root cause, applies a deeper fix or escalates, follows up."],
+  ["email","How would you write an email to inform a customer that their issue has been resolved?","Clear subject, greeting, issue summary, what was done, asks to confirm, offers further help, polite sign-off."],
+  ["email","Why is it important to maintain proper ticket notes?","Continuity, team handover, full history, accountability and reporting."],
+  ["email","What details should be included when creating a support ticket?","Customer name and contact, account or location, issue description, error text, steps to reproduce, impact, steps taken, screenshots, date and time."],
+  ["email","How would you write a short update to your manager about an unresolved issue?","Ticket ID, customer, issue and impact, actions taken, current status, blocker, next steps and ETA."],
+  ["email","Are you comfortable using Microsoft Outlook, Excel, and other basic office tools?","Honest level with examples: Outlook mail and calendar, Excel formulas, sort and filter, Word, Teams."]
+].map((r,i)=>({i, n:i+1, key:"q"+(i+1), cat:r[0], q:r[1], k:r[2]}));
+const LABELS = ["No answer","Poor","Fair","Good","Very good","Excellent"];
+const CAT_BY_ID = Object.fromEntries(CATS.map(c=>[c.id,c]));
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today = () => new Date().toISOString().slice(0,10);
+const newId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const blank = () => ({id:newId(), name:"", interviewer:"", date:today(), mode:"In person", shift:"Any shift", scores:{}, notes:{}, remarks:""});
+let cur = blank(), dirty = false, active = 0, candidates = [], db = null, downloads = null;
+let dash = {q:"", f:"all", sort:"date", open:null};
+const LS_DRAFT = "tsScorecardDraft", LS_LIST = "tsScorecardList";
+const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const lsSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+/* ---------- scoring ---------- */
+function verdictFor(p){
+  if (p == null) return {t:"Not scored yet", c:""};
+  if (p >= 75) return {t:"Recommended", c:"good"};
+  if (p >= 60) return {t:"Next round", c:"warn"};
+  return {t:"Not recommended", c:"bad"};
+}
+const scoreTone = v => v == null ? "" : v <= 1 ? "bad" : v === 2 ? "warn" : v === 3 ? "mid" : "good";
+const pctTone = p => p == null ? "" : p >= 75 ? "good" : p >= 60 ? "warn" : "bad";
+function compute(scores){
+  let earned = 0, rated = 0;
+  const cats = CATS.map(c=>{
+    const qs = Q.filter(q=>q.cat===c.id); let e=0, r=0;
+    qs.forEach(q=>{ const v = scores[q.key]; if (typeof v === "number"){ e+=v; r++; } });
+    earned += e; rated += r;
+    return {...c, earned:e, max:r*5, rated:r, total:qs.length, pct:r ? Math.round(e/(r*5)*100) : null};
+  });
+  const max = rated*5, pct = rated ? Math.round(earned/max*1000)/10 : null;
+  return {earned, max, rated, pct, cats, verdict:verdictFor(pct).t};
+}
+
+/* ---------- toasts ---------- */
+function toast(msg, tone){
+  const t = document.createElement("div"); t.className = "toast " + (tone||""); t.textContent = msg;
+  $("#toasts").appendChild(t); setTimeout(()=>t.remove(), 3200);
+}
+
+/* ---------- build questions ---------- */
+function build(){
+  $("#chips").innerHTML = CATS.map(c=>`<button class="chip" data-cat="${c.id}"><span class="cn">${c.short}</span><span class="cc" id="cc-${c.id}">0/${Q.filter(q=>q.cat===c.id).length}</span><span class="cb"><i id="cb-${c.id}" style="width:0%"></i></span></button>`).join("");
+  $("#questions").innerHTML = CATS.map(c=>{
+    const qs = Q.filter(q=>q.cat===c.id);
+    return `<section class="sec" id="sec-${c.id}" data-cat="${c.id}">
+      <div class="sec-head"><div><h2>${c.name}</h2><div class="sub">Questions ${qs[0].n}–${qs[qs.length-1].n} · ${qs.length} questions · ${qs.length*5} points</div></div>
+      <div class="sec-score"><b id="ss-${c.id}">–</b><br><span id="sp-${c.id}">0 of ${qs.length*5} pts</span></div></div>
+      <div class="qlist">${qs.map(q=>`
+        <article class="q" id="q-${q.i}" data-i="${q.i}">
+          <span class="qn">${String(q.n).padStart(2,"0")}</span>
+          <div class="qbody">
+            <span class="qcat">${c.name} · Question ${q.n} of ${Q.length}</span>
+            <h3 class="qt">${esc(q.q)}</h3>
+            <div class="qrow">
+              <div class="scale" role="radiogroup" aria-label="Rating for question ${q.n}">
+                ${[0,1,2,3,4,5].map(v=>`<button type="button" role="radio" data-v="${v}" aria-checked="false" title="${v} · ${LABELS[v]}">${v}</button>`).join("")}
+              </div>
+              <span class="readout" id="ro-${q.i}">Not rated</span>
+              <span class="qlinks">
+                <button type="button" class="ghost g-toggle" aria-expanded="false">Answer guide</button>
+                <button type="button" class="ghost n-toggle" aria-expanded="false">Add note</button>
+              </span>
+            </div>
+            <div class="guide" hidden><span class="label">A good answer covers</span>${esc(q.k)}</div>
+            <textarea class="note" id="note-${q.i}" placeholder="Note on this answer" hidden></textarea>
+          </div>
+        </article>`).join("")}</div></section>`;
+  }).join("");
+}
+
+/* ---------- radar ---------- */
+const R = 84;
+function pt(i, r){ const a = -Math.PI/2 + i*2*Math.PI/CATS.length; return [Math.cos(a)*r, Math.sin(a)*r]; }
+function drawRadar(cats){
+  const svg = $("#radar");
+  let g = "";
+  [25,50,75,100].forEach(p=>{
+    const pts = CATS.map((_,i)=>pt(i,R*p/100).map(v=>v.toFixed(1)).join(",")).join(" ");
+    g += `<polygon points="${pts}" fill="none" stroke="var(--band-line)" stroke-width="${p===100?1.2:.8}"/>`;
+  });
+  CATS.forEach((c,i)=>{ const [x,y]=pt(i,R); g += `<line x1="0" y1="0" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--band-line)" stroke-width=".8"/>`; });
+  [50,100].forEach(p=>{ g += `<text x="3" y="${(-R*p/100+10).toFixed(1)}" font-size="8.5" fill="var(--band-muted)" font-family="IBM Plex Mono, monospace">${p}</text>`; });
+  const vals = cats.map(c=>c.pct ?? 0);
+  const poly = vals.map((v,i)=>pt(i,R*v/100).map(n=>n.toFixed(1)).join(",")).join(" ");
+  g += `<polygon points="${poly}" fill="var(--band-accent)" fill-opacity=".22" stroke="var(--band-accent)" stroke-width="2" stroke-linejoin="round" style="transition:all .5s"/>`;
+  cats.forEach((c,i)=>{
+    const [x,y] = pt(i, R*(c.pct??0)/100);
+    const rated = c.pct != null;
+    g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${rated?'var(--band-accent)':'var(--band)'}" stroke="${rated?'var(--band)':'var(--band-muted)'}" stroke-width="2"/>`;
+    g += `<circle class="radar-dot" data-c="${i}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="13" fill="transparent"/>`;
+    const [lx,ly] = pt(i, R+16);
+    const anchor = Math.abs(lx) < 6 ? "middle" : lx > 0 ? "start" : "end";
+    g += `<text x="${lx.toFixed(1)}" y="${(ly+ (ly<-R ? -2 : ly>R*0.6 ? 10 : 4)).toFixed(1)}" text-anchor="${anchor}" font-size="11" fill="var(--band-muted)" font-family="IBM Plex Sans, sans-serif">${c.short} <tspan fill="var(--band-ink)" font-family="IBM Plex Mono, monospace" font-weight="600">${rated? c.pct+'%':'–'}</tspan></text>`;
+  });
+  svg.innerHTML = g;
+}
+$("#radar").addEventListener("mousemove", e=>{
+  const d = e.target.closest(".radar-dot"), tip = $("#tip");
+  if (!d){ tip.hidden = true; return; }
+  const c = lastCalc.cats[+d.dataset.c], box = $("#radarwrap").getBoundingClientRect(), r = d.getBoundingClientRect();
+  tip.innerHTML = `${c.name}<br><b>${c.pct==null?'Not rated':c.pct+'%'}</b> · ${c.earned}/${c.max} pts · ${c.rated}/${c.total} rated`;
+  tip.style.left = (r.left + r.width/2 - box.left) + "px"; tip.style.top = (r.top + r.height/2 - box.top) + "px"; tip.hidden = false;
+});
+$("#radar").addEventListener("mouseleave", ()=>{ $("#tip").hidden = true; });
+
+/* ---------- paint ---------- */
+let lastCalc = compute({});
+function tween(el, to, dec){
+  const from = parseFloat(el.dataset.v || "0"); el.dataset.v = to;
+  if (reduced || from === to){ el.textContent = to.toFixed(dec); return; }
+  const t0 = performance.now(), dur = 450;
+  (function step(t){ const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3); el.textContent = (from+(to-from)*e).toFixed(dec); if (k<1) requestAnimationFrame(step); })(t0);
+}
+function paintQuestion(i){
+  const q = Q[i], v = cur.scores[q.key], card = $("#q-"+i);
+  card.querySelectorAll(".scale button").forEach(b=>b.setAttribute("aria-checked", String(+b.dataset.v === v)));
+  card.dataset.tone = scoreTone(v);
+  $("#ro-"+i).innerHTML = typeof v === "number" ? `<b>${v}</b> · ${LABELS[v]}` : "Not rated";
+  const note = cur.notes?.[q.key] || "", nt = card.querySelector(".n-toggle"), ta = $("#note-"+i);
+  ta.value = note; nt.classList.toggle("has", !!note); nt.textContent = note ? "Edit note" : "Add note";
+}
+function paintSummary(){
+  const r = compute(cur.scores); lastCalc = r;
+  tween($("#s-pct"), r.pct ?? 0, r.pct != null && r.pct % 1 ? 1 : 0);
+  $("#s-raw").textContent = `${r.earned} / ${r.max} pts`;
+  const C = 452.39; $("#ring-arc").style.strokeDashoffset = C*(1-(r.pct||0)/100);
+  const vd = verdictFor(r.pct), toneVar = {good:"--band-good",warn:"--band-warn",bad:"--band-bad"}[vd.c] || "--band-accent";
+  $("#ring-arc").style.stroke = `var(${toneVar})`;
+  const ve = $("#s-verdict"); ve.className = "verdict " + vd.c; ve.lastElementChild.textContent = vd.t;
+  $("#s-rated").textContent = `${r.rated} / ${Q.length}`;
+  const ratedCats = r.cats.filter(c=>c.pct!=null);
+  const best = ratedCats.slice().sort((a,b)=>b.pct-a.pct)[0];
+  $("#s-best").textContent = best ? `${best.short} ${best.pct}%` : "–";
+  const weak = ratedCats.filter(c=>c.pct<50);
+  $("#s-weak").textContent = !ratedCats.length ? "–" : weak.length ? weak.map(c=>c.short).join(", ") : "None";
+  $("#m-pct").textContent = r.pct == null ? "–" : r.pct + "%";
+  $("#m-verdict").className = "mpill " + vd.c; $("#m-verdict").textContent = r.pct == null ? "Not scored" : vd.t;
+  r.cats.forEach(c=>{
+    $("#cc-"+c.id).textContent = `${c.rated}/${c.total}`;
+    $("#cb-"+c.id).style.width = (c.rated/c.total*100) + "%";
+    $(`.chip[data-cat="${c.id}"]`).classList.toggle("done", c.rated === c.total);
+    $("#ss-"+c.id).textContent = c.pct == null ? "–" : c.pct + "%";
+    $("#sp-"+c.id).textContent = `${c.earned} of ${c.max} pts · ${c.rated}/${c.total} rated`;
+  });
+  drawRadar(r.cats);
+  $("#f-bar").style.width = (r.rated/Q.length*100) + "%";
+  return r;
+}
+function paintAll(){ Q.forEach(q=>paintQuestion(q.i)); paintSummary(); setActive(active, false); }
+
+/* ---------- active question & focus mode ---------- */
+function setActive(i, scroll){
+  active = Math.max(0, Math.min(Q.length-1, i));
+  $$(".q.active").forEach(e=>e.classList.remove("active"));
+  const card = $("#q-"+active); card.classList.add("active");
+  const cat = Q[active].cat;
+  $$(".sec").forEach(s=>s.classList.toggle("cur", s.dataset.cat === cat));
+  $$(".chip").forEach(c=>c.classList.toggle("on", c.dataset.cat === cat));
+  $("#f-label").textContent = `Question ${active+1} of ${Q.length}`;
+  $("#f-prev").disabled = active === 0; $("#f-next").disabled = active === Q.length-1;
+  if (document.body.classList.contains("focus")){
+    card.classList.remove("slide-in"); void card.offsetWidth; card.classList.add("slide-in");
+    if (scroll) card.scrollIntoView({block:"nearest", behavior: reduced ? "auto" : "smooth"});
+  } else if (scroll){
+    card.scrollIntoView({block:"center", behavior: reduced ? "auto" : "smooth"});
+  }
+  const chip = $(`.chip[data-cat="${cat}"]`), strip = $("#chips");
+  const cl = chip.offsetLeft - strip.offsetLeft, cr = cl + chip.offsetWidth;
+  if (cl < strip.scrollLeft) strip.scrollLeft = cl - 8;
+  else if (cr > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = cr - strip.clientWidth + 8;
+}
+function rate(i, v, advance){
+  const k = Q[i].key;
+  if (cur.scores[k] === v && !advance) delete cur.scores[k]; else cur.scores[k] = v;
+  const btn = $(`#q-${i} .scale button[data-v="${v}"]`); btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+  const before = lastCalc.rated;
+  paintQuestion(i); const r = paintSummary(); touch();
+  if (r.rated === Q.length && before < Q.length) toast("All 52 questions rated. Add remarks and save the interview.");
+  if (advance && i < Q.length-1) setTimeout(()=>setActive(i+1, true), document.body.classList.contains("focus") ? 220 : 60);
+}
+function setFocus(on){
+  document.body.classList.toggle("focus", on);
+  $("#btn-focus").setAttribute("aria-pressed", String(on));
+  setActive(active, true);
+}
+
+document.addEventListener("click", e=>{
+  const sb = e.target.closest(".scale button");
+  if (sb){ const i = +sb.closest(".q").dataset.i; setActive(i, false); rate(i, +sb.dataset.v, document.body.classList.contains("focus")); return; }
+  const g = e.target.closest(".g-toggle");
+  if (g){ const guide = g.closest(".qbody").querySelector(".guide"); guide.hidden = !guide.hidden; g.setAttribute("aria-expanded", String(!guide.hidden)); return; }
+  const n = e.target.closest(".n-toggle");
+  if (n){ const ta = n.closest(".qbody").querySelector(".note"); ta.hidden = !ta.hidden; n.setAttribute("aria-expanded", String(!ta.hidden)); if (!ta.hidden) ta.focus(); return; }
+  const card = e.target.closest(".q");
+  if (card && !e.target.closest("textarea")) setActive(+card.dataset.i, false);
+  const chip = e.target.closest(".chip");
+  if (chip){ const first = Q.find(q=>q.cat===chip.dataset.cat); setActive(first.i, false);
+    if (document.body.classList.contains("focus")) setActive(first.i, true);
+    else $("#sec-"+chip.dataset.cat).scrollIntoView({block:"start", behavior: reduced ? "auto" : "smooth"}); }
+});
+document.addEventListener("input", e=>{
+  if (e.target.classList.contains("note")){
+    const i = +e.target.closest(".q").dataset.i, k = Q[i].key;
+    cur.notes = cur.notes || {};
+    if (e.target.value.trim()) cur.notes[k] = e.target.value; else delete cur.notes[k];
+    const nt = e.target.closest(".qbody").querySelector(".n-toggle"); nt.classList.toggle("has", !!cur.notes[k]); nt.textContent = cur.notes[k] ? "Edit note" : "Add note";
+    touch();
+  }
+});
+document.addEventListener("keydown", e=>{
+  if (e.target.closest("input,textarea,select") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if ($("#view-sheet").hidden) return;
+  const k = e.key.toLowerCase();
+  if (/^[0-5]$/.test(k)){ e.preventDefault(); rate(active, +k, true); }
+  else if (k === "j" || (k === "arrowright" && document.body.classList.contains("focus"))){ e.preventDefault(); setActive(active+1, true); }
+  else if (k === "k" || (k === "arrowleft" && document.body.classList.contains("focus"))){ e.preventDefault(); setActive(active-1, true); }
+  else if (k === "f"){ e.preventDefault(); setFocus(!document.body.classList.contains("focus")); }
+  else if (k === "escape" && document.body.classList.contains("focus")){ setFocus(false); }
+  else if (k === "g"){ e.preventDefault(); $(`#q-${active} .g-toggle`).click(); }
+  else if (k === "n"){ e.preventDefault(); const t = $(`#q-${active} .n-toggle`); const ta = $("#note-"+active); if (ta.hidden) t.click(); else ta.focus(); }
+});
+$("#btn-focus").addEventListener("click", ()=>setFocus(!document.body.classList.contains("focus")));
+$("#f-prev").addEventListener("click", ()=>setActive(active-1, true));
+$("#f-next").addEventListener("click", ()=>setActive(active+1, true));
+$("#btn-guides").addEventListener("click", e=>{
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", String(on)); e.currentTarget.textContent = on ? "Hide answer guides" : "Show all answer guides";
+  $$(".guide").forEach(g=>g.hidden = !on); $$(".g-toggle").forEach(b=>b.setAttribute("aria-expanded", String(on)));
+});
+$("#btn-next-unrated").addEventListener("click", ()=>{
+  const order = [...Q.slice(active+1), ...Q.slice(0, active+1)];
+  const nx = order.find(q=>typeof cur.scores[q.key] !== "number");
+  if (nx) setActive(nx.i, true); else toast("Every question is rated.");
+});
+const navObs = new IntersectionObserver(([en])=>$("#navbar").classList.toggle("stuck", en.intersectionRatio < 1), {threshold:[1], rootMargin:"-1px 0px 0px 0px"});
+navObs.observe($("#navbar"));
+
+/* ---------- form & saving ---------- */
+function fillForm(){
+  $("#f-name").value = cur.name||""; $("#f-interviewer").value = cur.interviewer||"";
+  $("#f-date").value = cur.date||today(); $("#f-mode").value = cur.mode||"In person"; $("#f-shift").value = cur.shift||"Any shift";
+  $("#f-remarks").value = cur.remarks||"";
+  $$(".note").forEach(t=>t.hidden = true);
+  paintAll();
+}
+[["name","f-name"],["interviewer","f-interviewer"],["date","f-date"],["mode","f-mode"],["shift","f-shift"],["remarks","f-remarks"]]
+  .forEach(([f,id])=>$("#"+id).addEventListener("input", e=>{ cur[f] = e.target.value; touch(); }));
+let draftTimer;
+function touch(){ dirty = true; clearTimeout(draftTimer); draftTimer = setTimeout(()=>lsSet(LS_DRAFT, cur), 400); status(""); }
+function status(t){ $("#save-status").textContent = t; $("#save-status-2").textContent = t; }
+
+async function save(){
+  if (!cur.name.trim()){ toast("Enter the candidate's name before saving.", "bad"); $("#f-name").focus(); window.scrollTo({top:0, behavior: reduced ? "auto" : "smooth"}); return; }
+  const r = compute(cur.scores);
+  if (!r.rated){ toast("Rate at least one question before saving.", "bad"); return; }
+  const rec = {...cur, name:cur.name.trim(), earned:r.earned, max:r.max, rated:r.rated, pct:r.pct, verdict:r.verdict,
+    catPct:Object.fromEntries(r.cats.map(c=>[c.id,c.pct])), updatedAt:new Date().toISOString()};
+  $("#btn-save").disabled = $("#btn-save-2").disabled = true;
+  try{
+    if (db) await db.doc("candidates/"+cur.id).set(rec);
+    else { const list = (lsGet(LS_LIST)||[]).filter(x=>x.id!==cur.id); list.push(rec); lsSet(LS_LIST, list); candidates = list; renderDash(); }
+    dirty = false; status(`Saved at ${new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}`);
+    toast(`Saved ${rec.name}: ${r.pct}%, ${r.verdict}.`);
+  }catch(err){
+    toast(err?.code==="quota_exceeded" ? "Storage is full. Delete old interviews on the Candidates tab, then save again." :
+      err?.code==="invalid_argument" ? "You have view-only access. Ask the owner for Contributor access to save." :
+      "Couldn't save. Check your connection and try again.", "bad");
+  }finally{ $("#btn-save").disabled = $("#btn-save-2").disabled = false; }
+}
+$("#cand-form").addEventListener("submit", e=>{ e.preventDefault(); save(); });
+$("#btn-save-2").addEventListener("click", save);
+
+let newArmed = false, newTimer;
+$("#btn-new").addEventListener("click", ()=>{
+  const b = $("#btn-new");
+  if (dirty && Object.keys(cur.scores).length && !newArmed){
+    newArmed = true; b.textContent = "Discard unsaved scores?"; b.classList.add("danger");
+    newTimer = setTimeout(()=>{ newArmed = false; b.textContent = "New interview"; b.classList.remove("danger"); }, 4000); return;
+  }
+  clearTimeout(newTimer); newArmed = false; b.textContent = "New interview"; b.classList.remove("danger");
+  const keep = cur.interviewer; cur = blank(); cur.interviewer = keep; dirty = false; active = 0;
+  lsSet(LS_DRAFT, cur); fillForm(); status(""); toast("Started a new score sheet."); $("#f-name").focus();
+});
+
+/* ---------- tabs ---------- */
+function showTab(which){
+  const sheet = which === "sheet";
+  $("#tab-sheet").setAttribute("aria-selected", sheet); $("#tab-dash").setAttribute("aria-selected", !sheet);
+  $("#view-sheet").hidden = !sheet; $("#view-dash").hidden = sheet;
+  if (!sheet && document.body.classList.contains("focus")) document.body.classList.remove("focus"), $("#btn-focus").setAttribute("aria-pressed","false");
+}
+$("#tab-sheet").addEventListener("click", ()=>showTab("sheet"));
+$("#tab-dash").addEventListener("click", ()=>showTab("dash"));
+
+/* ---------- dashboard ---------- */
+function teamAvg(){
+  return Object.fromEntries(CATS.map(c=>{
+    const v = candidates.map(x=>x.catPct?.[c.id]).filter(p=>typeof p==="number");
+    return [c.id, v.length ? Math.round(v.reduce((a,b)=>a+b,0)/v.length) : null];
+  }));
+}
+function renderDash(){
+  const all = candidates;
+  $("#cand-count").textContent = all.length;
+  $("#k-count").textContent = all.length;
+  const scored = all.filter(c=>typeof c.pct==="number");
+  $("#k-avg").textContent = scored.length ? (scored.reduce((s,c)=>s+c.pct,0)/scored.length).toFixed(1)+"%" : "–";
+  const n = {Recommended:0, "Next round":0, "Not recommended":0}; all.forEach(c=>{ if (c.verdict in n) n[c.verdict]++; });
+  $("#k-rec").textContent = n.Recommended; $("#k-next").textContent = n["Next round"]; $("#k-rej").textContent = n["Not recommended"];
+  const tot = all.length || 1;
+  $("#dist").innerHTML = all.length ? [["good","Recommended"],["warn","Next round"],["bad","Not recommended"]].filter(([,k])=>n[k]).map(([c,k])=>`<i class="${c}" style="width:${n[k]/tot*100}%" title="${k}: ${n[k]}"></i>`).join("") : "";
+  $("#dist-legend").innerHTML = [["good","Recommended"],["warn","Next round"],["bad","Not recommended"]].map(([c,k])=>`<span><i style="background:var(--${c})"></i>${k} <b class="num">${n[k]}</b>${all.length?` <span class="num">(${Math.round(n[k]/tot*100)}%)</span>`:""}</span>`).join("");
+
+  let list = all.filter(c=>(dash.f==="all" || c.verdict===dash.f) && (!dash.q || (c.name+" "+(c.interviewer||"")).toLowerCase().includes(dash.q)));
+  list.sort(dash.sort==="score" ? (a,b)=>(b.pct??-1)-(a.pct??-1) : dash.sort==="name" ? (a,b)=>(a.name||"").localeCompare(b.name||"") :
+    (a,b)=>(b.date||"").localeCompare(a.date||"") || (b.updatedAt||"").localeCompare(a.updatedAt||""));
+  if (!all.length){ $("#dash-body").innerHTML = `<tr><td colspan="7"><div class="empty"><div>No saved interviews yet.</div><div>Score a candidate on the score sheet and press Save interview. Their result appears here.</div><button class="btn primary" id="go-sheet">Go to score sheet</button></div></td></tr>`; $("#go-sheet").onclick = ()=>showTab("sheet"); return; }
+  if (!list.length){ $("#dash-body").innerHTML = `<tr><td colspan="7"><div class="empty">No interviews match this search or filter.</div></td></tr>`; return; }
+  const avg = teamAvg();
+  $("#dash-body").innerHTML = list.map(c=>{
+    const vd = verdictFor(c.pct), open = dash.open === c.id;
+    const bars = CATS.map(k=>{ const p = c.catPct?.[k.id]; return `<i title="${k.name}: ${p==null?'not rated':p+'%'}" style="height:${p==null?2:Math.max(2,p*.24)}px;${p==null?'opacity:.25':''}"></i>`; }).join("");
+    let html = `<tr class="row ${open?'open':''}" data-id="${esc(c.id)}" tabindex="0" aria-expanded="${open}">
+      <td><span class="cname">${esc(c.name)}</span><div class="store-note">${esc(c.mode||"")}${c.shift?` · ${esc(c.shift)}`:""}</div></td>
+      <td class="num">${esc(c.date)}</td><td>${esc(c.interviewer||"–")}</td>
+      <td class="r num">${c.earned}/${c.max}</td>
+      <td class="r"><div class="pbar"><span class="num">${c.pct ?? "–"}%</span><span class="t"><i class="${pctTone(c.pct)}" style="width:${c.pct||0}%"></i></span></div></td>
+      <td><div class="minibars" aria-label="Section scores">${bars}</div></td>
+      <td><span class="mpill ${vd.c}">${vd.t}</span></td></tr>`;
+    if (open){
+      const notes = Object.entries(c.notes||{}).filter(([,v])=>v);
+      html += `<tr class="detail"><td colspan="7"><div class="dgrid">
+        <div><div class="label" style="margin-bottom:10px">Section scores vs. team average</div>
+          <div class="cmp">${CATS.map(k=>{ const p = c.catPct?.[k.id], a = avg[k.id];
+            return `<div class="cmp-row"><span>${k.name}</span><div class="cmp-track">${p!=null?`<i style="width:${p}%"></i>`:""}${a!=null?`<b style="left:calc(${a}% - 1px)" title="Team average ${a}%"></b>`:""}</div><span class="v">${p==null?"–":p+"%"}</span></div>`; }).join("")}</div>
+          <div class="legend" style="margin-top:10px"><span><i style="background:var(--accent)"></i>${esc(c.name)}</span><span><i style="background:var(--ink);width:2px;height:12px;border-radius:1px"></i>Team average</span></div>
+        </div>
+        <div><div class="label">Remarks</div><p style="margin:4px 0 12px">${c.remarks ? esc(c.remarks) : '<span class="store-note">No remarks.</span>'}</p>
+          ${notes.length ? `<div class="label">Question notes</div><ul style="margin:4px 0 0;padding-left:18px;font-size:13.5px">${notes.slice(0,6).map(([k,v])=>`<li><b class="num">Q${k.slice(1)}</b> ${esc(v)}</li>`).join("")}</ul>` : ""}
+          <div class="dactions"><button class="btn primary" data-open="${esc(c.id)}">Open score sheet</button><button class="btn danger" data-del="${esc(c.id)}">Delete</button></div>
+        </div></div></td></tr>`;
+    }
+    return html;
+  }).join("");
+}
+$("#q-search").addEventListener("input", e=>{ dash.q = e.target.value.trim().toLowerCase(); renderDash(); });
+$("#q-sort").addEventListener("change", e=>{ dash.sort = e.target.value; renderDash(); });
+$("#q-filter").addEventListener("click", e=>{ const b = e.target.closest("button"); if (!b) return; dash.f = b.dataset.f; $$("#q-filter button").forEach(x=>x.setAttribute("aria-pressed", String(x===b))); renderDash(); });
+
+let delArmed = null;
+$("#dash-body").addEventListener("click", async e=>{
+  const o = e.target.closest("[data-open]"), d = e.target.closest("[data-del]"), row = e.target.closest("tr.row");
+  if (o){
+    const c = candidates.find(x=>x.id===o.dataset.open); if (!c) return;
+    cur = {...blank(), id:c.id, name:c.name, interviewer:c.interviewer, date:c.date, mode:c.mode, shift:c.shift||"Any shift", scores:{...(c.scores||{})}, notes:{...(c.notes||{})}, remarks:c.remarks||""};
+    dirty = false; active = 0; fillForm(); showTab("sheet"); window.scrollTo({top:0}); toast(`Editing ${c.name}. Save to keep changes.`); return;
+  }
+  if (d){
+    const id = d.dataset.del;
+    if (delArmed !== id){ delArmed = id; d.textContent = "Click again to delete"; setTimeout(()=>{ if (delArmed===id){ delArmed = null; d.textContent = "Delete"; } }, 4000); return; }
+    delArmed = null;
+    try{
+      if (db) await db.doc("candidates/"+id).delete();
+      else { candidates = candidates.filter(x=>x.id!==id); lsSet(LS_LIST, candidates); renderDash(); }
+      toast("Interview deleted.");
+    }catch{ toast("Couldn't delete. You may have view-only access.", "bad"); }
+    return;
+  }
+  if (row){ dash.open = dash.open === row.dataset.id ? null : row.dataset.id; renderDash(); }
+});
+$("#dash-body").addEventListener("keydown", e=>{ const row = e.target.closest("tr.row"); if (row && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); row.click(); } });
+
+$("#btn-csv").addEventListener("click", async ()=>{
+  const head = ["Candidate","Date","Interviewer","Mode","Shift","Points","Max","Percent","Verdict",...CATS.map(c=>c.name+" %"),...Q.map(q=>"Q"+q.n),"Remarks"];
+  const cell = v => { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
+  const rows = candidates.map(c=>[c.name,c.date,c.interviewer,c.mode,c.shift,c.earned,c.max,c.pct,c.verdict,...CATS.map(k=>c.catPct?.[k.id] ?? ""),...Q.map(q=>c.scores?.[q.key] ?? ""),c.remarks]);
+  const csv = [head,...rows].map(r=>r.map(cell).join(",")).join("\r\n");
+  try{ await downloads.save({filename:`support-trainee-interviews-${today()}.csv`, data:"﻿"+csv}); toast("CSV exported."); }
+  catch(err){ if (err?.code !== "declined") toast("Export isn't available here.", "bad"); }
+});
+
+/* ---------- boot ---------- */
+build();
+const draft = lsGet(LS_DRAFT);
+if (draft && draft.id && draft.scores){ cur = {...blank(), ...draft}; dirty = Object.keys(draft.scores).length > 0; }
+fillForm();
+candidates = lsGet(LS_LIST) || [];
+renderDash();
+$("#store-note").textContent = "Interviews are saved in this browser only.";
+
+(async ()=>{
+  if (!window.claude?.use) return;
+  try { downloads = await window.claude.use("downloads"); } catch { downloads = null; }
+  $("#btn-csv").hidden = !downloads;
+  try { db = await window.claude.use("db"); } catch { db = null; }
+  if (!db) return;
+  $("#store-note").textContent = "Saved interviews are shared with everyone who can open this page.";
+  db.collection("candidates").onSnapshot(snap=>{
+    candidates = snap.docs.map(d=>({...d.data(), id:d.id}));
+    renderDash();
+  }, ()=>{ $("#store-note").textContent = "Live updates stopped. Reload the page to reconnect."; });
+})();
+</script>
