@@ -270,6 +270,14 @@ tbody tr.row.open{background:var(--accent-soft)}
 .cmp-row .v{font-family:var(--mono);text-align:right}
 .dactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .btn.danger{color:var(--bad);border-color:var(--bad)}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.sheet-head h3{font-size:18px;margin-top:4px}
+.sheet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0}
+.sheet-grid label{display:flex;flex-direction:column;gap:4px;min-width:0}
+.sheet-grid input[type="text"]{border:1px solid var(--line);background:var(--ground);border-radius:10px;padding:8px 12px;min-width:0;width:100%}
+.check{flex-direction:row!important;align-items:center;gap:8px!important;font-size:14px;align-self:end;padding-bottom:8px}
+.sheet-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sheet-actions a{color:var(--accent-strong);font-weight:600;font-size:14px}
 .empty{padding:40px 20px;text-align:center;color:var(--muted);display:grid;gap:12px;justify-items:center}
 .store-note{font-size:13px;color:var(--muted)}
 
@@ -321,8 +329,8 @@ tbody tr.row.open{background:var(--accent-soft)}
             <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
               <circle cx="88" cy="88" r="72" fill="none" stroke="var(--band-line)" stroke-width="12"/>
               <circle id="ring-arc" class="arc" cx="88" cy="88" r="72" fill="none" stroke="var(--band-accent)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 88 88)" stroke-dasharray="452.39" stroke-dashoffset="452.39"/>
-              <line x1="88" y1="8" x2="88" y2="22" stroke="var(--band-muted)" stroke-width="1.5" transform="rotate(216 88 88)"/>
-              <line x1="88" y1="8" x2="88" y2="22" stroke="var(--band-muted)" stroke-width="1.5" transform="rotate(270 88 88)"/>
+              <line x1="88" y1="8" x2="88" y2="22" stroke="var(--band-muted)" stroke-width="1.5" id="tick-next" transform="rotate(162 88 88)"/>
+              <line x1="88" y1="8" x2="88" y2="22" stroke="var(--band-muted)" stroke-width="1.5" id="tick-rec" transform="rotate(216 88 88)"/>
             </svg>
             <div class="center" aria-live="polite">
               <div class="pct"><span id="s-pct">0</span><small>%</small></div>
@@ -334,7 +342,7 @@ tbody tr.row.open{background:var(--accent-soft)}
             <div class="stat-row"><span>Questions rated</span><b id="s-rated">0 / 52</b></div>
             <div class="stat-row"><span>Strongest section</span><b id="s-best">–</b></div>
             <div class="stat-row"><span>Weak areas (&lt;50%)</span><b id="s-weak">–</b></div>
-            <div style="font-size:12px;color:var(--band-muted)">Ticks on the ring mark 60% (next round) and 75% (recommended).</div>
+            <div style="font-size:12px;color:var(--band-muted)">Ticks on the ring mark <span id="tick-note">45% (next round) and 60% (recommended)</span>.</div>
           </div>
         </div>
         <div class="radarwrap" id="radarwrap"><svg id="radar" viewBox="-195 -118 390 236" role="img" aria-label="Section scores radar"></svg><div class="tip" id="tip" hidden></div></div>
@@ -386,6 +394,28 @@ tbody tr.row.open{background:var(--accent-soft)}
       <div class="label">Verdict split</div>
       <div class="dist" id="dist"></div>
       <div class="legend" id="dist-legend"></div>
+    </div>
+    <div class="panel" id="sheet-panel">
+      <div class="sheet-head">
+        <div><div class="label">Google Sheet</div><h3>Send results to your sheet</h3></div>
+        <span class="mpill" id="sheet-state">Not connected</span>
+      </div>
+      <p class="store-note" style="margin:6px 0 0">Each saved interview becomes one row with Candidate Name, Date, Interviewer, Points, Score, Sections and Verdict. Saving again updates the same row, and deleting an interview removes it. You sign in with a Google account that can edit the sheet.</p>
+      <div id="sheet-controls">
+        <div class="sheet-grid">
+          <label><span class="label">Sheet ID</span><input type="text" id="sheet-id" placeholder="Paste the sheet ID or its full link" spellcheck="false"></label>
+          <label><span class="label">Tab name</span><input type="text" id="sheet-tab" placeholder="e.g. Interview" spellcheck="false"></label>
+          <label><span class="label">Google OAuth Client ID</span><input type="text" id="sheet-client" placeholder="….apps.googleusercontent.com" spellcheck="false"></label>
+          <label class="check"><input type="checkbox" id="sheet-auto" checked> Send automatically when I save or delete</label>
+        </div>
+        <div class="sheet-actions">
+          <button class="btn primary" id="sheet-save">Connect Google account</button>
+          <button class="btn" id="sheet-sync">Send all interviews</button>
+          <a id="sheet-link" target="_blank" rel="noopener">Open Google Sheet ↗</a>
+          <span class="store-note" id="sheet-status"></span>
+        </div>
+      </div>
+      <p class="store-note" id="sheet-unavailable" hidden style="margin:10px 0 0"></p>
     </div>
     <div class="filters">
       <div class="l">
@@ -499,14 +529,16 @@ const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch {
 const lsSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
 /* ---------- scoring ---------- */
+/* Verdict cut-offs in percent: Recommended at or above `rec`, Next round at or above `next`. */
+const THRESHOLDS = {rec:60, next:45};
 function verdictFor(p){
   if (p == null) return {t:"Not scored yet", c:""};
-  if (p >= 75) return {t:"Recommended", c:"good"};
-  if (p >= 60) return {t:"Next round", c:"warn"};
+  if (p >= THRESHOLDS.rec) return {t:"Recommended", c:"good"};
+  if (p >= THRESHOLDS.next) return {t:"Next round", c:"warn"};
   return {t:"Not recommended", c:"bad"};
 }
 const scoreTone = v => v == null ? "" : v <= 1 ? "bad" : v === 2 ? "warn" : v === 3 ? "mid" : "good";
-const pctTone = p => p == null ? "" : p >= 75 ? "good" : p >= 60 ? "warn" : "bad";
+const pctTone = p => p == null ? "" : p >= THRESHOLDS.rec ? "good" : p >= THRESHOLDS.next ? "warn" : "bad";
 function compute(scores){
   let earned = 0, rated = 0;
   const cats = CATS.map(c=>{
@@ -749,6 +781,7 @@ async function save(){
     else { const list = (lsGet(LS_LIST)||[]).filter(x=>x.id!==cur.id); list.push(rec); lsSet(LS_LIST, list); candidates = list; renderDash(); }
     dirty = false; status(`Saved at ${new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}`);
     toast(`Saved ${rec.name}: ${r.pct}%, ${r.verdict}.`);
+    if (sheetReady() && sheetCfg.auto) sheetSend(i=>upsertRows([rec], i), `Sent ${rec.name} to the Google Sheet.`, false);
   }catch(err){
     toast(err?.code==="quota_exceeded" ? "Storage is full. Delete old interviews on the Candidates tab, then save again." :
       err?.code==="invalid_argument" ? "You have view-only access. Ask the owner for Contributor access to save." :
@@ -793,13 +826,13 @@ function renderDash(){
   $("#k-count").textContent = all.length;
   const scored = all.filter(c=>typeof c.pct==="number");
   $("#k-avg").textContent = scored.length ? (scored.reduce((s,c)=>s+c.pct,0)/scored.length).toFixed(1)+"%" : "–";
-  const n = {Recommended:0, "Next round":0, "Not recommended":0}; all.forEach(c=>{ if (c.verdict in n) n[c.verdict]++; });
+  const n = {Recommended:0, "Next round":0, "Not recommended":0}; all.forEach(c=>{ const v = verdictFor(c.pct).t; if (v in n) n[v]++; });
   $("#k-rec").textContent = n.Recommended; $("#k-next").textContent = n["Next round"]; $("#k-rej").textContent = n["Not recommended"];
   const tot = all.length || 1;
   $("#dist").innerHTML = all.length ? [["good","Recommended"],["warn","Next round"],["bad","Not recommended"]].filter(([,k])=>n[k]).map(([c,k])=>`<i class="${c}" style="width:${n[k]/tot*100}%" title="${k}: ${n[k]}"></i>`).join("") : "";
   $("#dist-legend").innerHTML = [["good","Recommended"],["warn","Next round"],["bad","Not recommended"]].map(([c,k])=>`<span><i style="background:var(--${c})"></i>${k} <b class="num">${n[k]}</b>${all.length?` <span class="num">(${Math.round(n[k]/tot*100)}%)</span>`:""}</span>`).join("");
 
-  let list = all.filter(c=>(dash.f==="all" || c.verdict===dash.f) && (!dash.q || (c.name+" "+(c.interviewer||"")).toLowerCase().includes(dash.q)));
+  let list = all.filter(c=>(dash.f==="all" || verdictFor(c.pct).t===dash.f) && (!dash.q || (c.name+" "+(c.interviewer||"")).toLowerCase().includes(dash.q)));
   list.sort(dash.sort==="score" ? (a,b)=>(b.pct??-1)-(a.pct??-1) : dash.sort==="name" ? (a,b)=>(a.name||"").localeCompare(b.name||"") :
     (a,b)=>(b.date||"").localeCompare(a.date||"") || (b.updatedAt||"").localeCompare(a.updatedAt||""));
   if (!all.length){ $("#dash-body").innerHTML = `<tr><td colspan="7"><div class="empty"><div>No saved interviews yet.</div><div>Score a candidate on the score sheet and press Save interview. Their result appears here.</div><button class="btn primary" id="go-sheet">Go to score sheet</button></div></td></tr>`; $("#go-sheet").onclick = ()=>showTab("sheet"); return; }
@@ -851,6 +884,7 @@ $("#dash-body").addEventListener("click", async e=>{
       if (db) await db.doc("candidates/"+id).delete();
       else { candidates = candidates.filter(x=>x.id!==id); lsSet(LS_LIST, candidates); renderDash(); }
       toast("Interview deleted.");
+      if (sheetReady() && sheetCfg.auto) sheetSend(i=>deleteRows([id], i), "Removed the row from the Google Sheet.", false);
     }catch{ toast("Couldn't delete. You may have view-only access.", "bad"); }
     return;
   }
@@ -861,7 +895,7 @@ $("#dash-body").addEventListener("keydown", e=>{ const row = e.target.closest("t
 $("#btn-csv").addEventListener("click", async ()=>{
   const head = ["Candidate","Date","Interviewer","Mode","Shift","Points","Max","Percent","Verdict",...CATS.map(c=>c.name+" %"),...Q.map(q=>"Q"+q.n),"Remarks"];
   const cell = v => { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
-  const rows = candidates.map(c=>[c.name,c.date,c.interviewer,c.mode,c.shift,c.earned,c.max,c.pct,c.verdict,...CATS.map(k=>c.catPct?.[k.id] ?? ""),...Q.map(q=>c.scores?.[q.key] ?? ""),c.remarks]);
+  const rows = candidates.map(c=>[c.name,c.date,c.interviewer,c.mode,c.shift,c.earned,c.max,c.pct,verdictFor(c.pct).t,...CATS.map(k=>c.catPct?.[k.id] ?? ""),...Q.map(q=>c.scores?.[q.key] ?? ""),c.remarks]);
   const csv = [head,...rows].map(r=>r.map(cell).join(",")).join("\r\n");
   await saveFile(`support-trainee-interviews-${today()}.csv`, "﻿"+csv, "text/csv;charset=utf-8", "CSV exported.");
 });
@@ -899,7 +933,182 @@ $("#f-restore").addEventListener("change", async e=>{
   }catch{ toast("That file isn't a scorecard backup. Choose a .json file made with Back up.", "bad"); }
 });
 
+/* ---------- Google Sheet sync ---------- */
+// Writes straight to the sheet through the Google Sheets API, as the signed-in interviewer.
+// The OAuth Client ID is not a secret: fill in SHEET_DEFAULTS to set this up for everyone.
+const SHEET_DEFAULTS = {sheetId:"1N8eKTMRpRnx0yJzVTafGt8254NSF2mcLkGkBn6g8vrM", tab:"Interview", clientId:"", auto:true};
+const SHEET_HEADERS = ["Candidate Name","Date","Interviewer","Points","Score","Sections","Verdict","Record ID","Last updated"];
+const SHEET_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
+const LS_SHEET = "tsScorecardSheetApi";
+let sheetCfg = {...SHEET_DEFAULTS, ...(lsGet(LS_SHEET) || {})};
+let gisLoading = null, gToken = null, gTokenExp = 0, gTokenFor = "";
+
+const sheetBlocked = () => window.claude?.use ? "claude" : location.protocol === "file:" ? "file" : "";
+const sheetReady = () => !sheetBlocked() && !!sheetCfg.sheetId && !!sheetCfg.tab && /\.apps\.googleusercontent\.com$/.test(sheetCfg.clientId || "");
+const sheetErr = (code, message) => Object.assign(new Error(message || code), {code});
+const parseSheetId = v => (String(v).match(/\/d\/([a-zA-Z0-9_-]+)/) || [])[1] || String(v).trim();
+const a1 = range => `'${sheetCfg.tab.replace(/'/g, "''")}'!${range}`;
+
+function loadGis(){
+  if (window.google?.accounts?.oauth2) return Promise.resolve();
+  if (!gisLoading) gisLoading = new Promise((res, rej)=>{
+    const sc = document.createElement("script"); sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
+    sc.onload = res; sc.onerror = ()=>{ gisLoading = null; rej(sheetErr("gis_load")); };
+    document.head.appendChild(sc);
+  });
+  return gisLoading;
+}
+// interactive=false never opens a pop-up (browsers block pop-ups that don't follow a click).
+async function getToken(interactive){
+  if (gToken && gTokenFor === sheetCfg.clientId && Date.now() < gTokenExp - 60000) return gToken;
+  if (!interactive) throw sheetErr("signin");
+  await loadGis();
+  return new Promise((resolve, reject)=>{
+    google.accounts.oauth2.initTokenClient({
+      client_id: sheetCfg.clientId, scope: SHEET_SCOPE,
+      callback: r=>{
+        if (r.error) return reject(sheetErr("auth", r.error));
+        gToken = r.access_token; gTokenExp = Date.now() + r.expires_in*1000; gTokenFor = sheetCfg.clientId; resolve(gToken);
+      },
+      error_callback: e=>reject(sheetErr("auth", e?.type))
+    }).requestAccessToken();
+  });
+}
+async function sheetsApi(path, opts, interactive, retried){
+  const t = await getToken(interactive);
+  const res = await fetch("https://sheets.googleapis.com/v4/spreadsheets/" + encodeURIComponent(sheetCfg.sheetId) + path,
+    {...opts, headers:{Authorization:"Bearer " + t, "Content-Type":"application/json"}});
+  if (res.status === 401 && !retried){ gToken = null; return sheetsApi(path, opts, interactive, true); }
+  const body = await res.json().catch(()=>({}));
+  if (!res.ok) throw sheetErr(res.status, body.error?.message || res.statusText);
+  return body;
+}
+async function tabGid(interactive){
+  const meta = await sheetsApi("?fields=sheets.properties(sheetId,title)", {}, interactive);
+  const tab = (meta.sheets || []).find(x=>x.properties.title === sheetCfg.tab);
+  if (!tab) throw sheetErr("tab");
+  return tab.properties.sheetId;
+}
+const rgb = h => ({red:parseInt(h.slice(1,3),16)/255, green:parseInt(h.slice(3,5),16)/255, blue:parseInt(h.slice(5,7),16)/255});
+// Writes the header row when it is missing or different, and formats the tab the first time.
+async function ensureHeaders(interactive){
+  const gid = await tabGid(interactive);
+  const cur = await sheetsApi(`/values/${encodeURIComponent(a1("A1:I1"))}`, {}, interactive);
+  if ((cur.values?.[0] || []).join("|") === SHEET_HEADERS.join("|")) return;
+  await sheetsApi(`/values/${encodeURIComponent(a1("A1:I1"))}?valueInputOption=RAW`, {method:"PUT", body:JSON.stringify({values:[SHEET_HEADERS]})}, interactive);
+  const verdictCol = {sheetId:gid, startRowIndex:1, startColumnIndex:6, endColumnIndex:7};
+  const rule = (text, bg, fg) => ({addConditionalFormatRule:{index:0, rule:{ranges:[verdictCol], booleanRule:{
+    condition:{type:"TEXT_EQ", values:[{userEnteredValue:text}]}, format:{backgroundColor:rgb(bg), textFormat:{foregroundColor:rgb(fg)}}}}}});
+  await sheetsApi(":batchUpdate", {method:"POST", body:JSON.stringify({requests:[
+    {repeatCell:{range:{sheetId:gid, startRowIndex:0, endRowIndex:1, startColumnIndex:0, endColumnIndex:SHEET_HEADERS.length},
+      cell:{userEnteredFormat:{textFormat:{bold:true, foregroundColor:rgb("#FFFFFF")}, backgroundColor:rgb("#0F2438")}}, fields:"userEnteredFormat(textFormat,backgroundColor)"}},
+    {repeatCell:{range:{sheetId:gid, startRowIndex:1, startColumnIndex:4, endColumnIndex:5},
+      cell:{userEnteredFormat:{numberFormat:{type:"PERCENT", pattern:"0.0%"}}}, fields:"userEnteredFormat.numberFormat"}},
+    {updateSheetProperties:{properties:{sheetId:gid, gridProperties:{frozenRowCount:1}}, fields:"gridProperties.frozenRowCount"}},
+    rule("Recommended", "#DCF0E4", "#1E7A4C"), rule("Next round", "#F8EACB", "#9A6400"), rule("Not recommended", "#F6DDDA", "#B3352E")
+  ]})}, interactive).catch(()=>{});
+}
+async function rowIndex(interactive){
+  const r = await sheetsApi(`/values/${encodeURIComponent(a1("H2:H"))}`, {}, interactive);
+  const at = {}; (r.values || []).forEach((v,i)=>{ if (v[0]) at[v[0]] = i + 2; });
+  return at;
+}
+function sheetRow(c){
+  const d = c.updatedAt ? new Date(c.updatedAt) : new Date(), pad = n => String(n).padStart(2,"0");
+  return [
+    c.name || "", c.date || "", c.interviewer || "", `${c.earned} / ${c.max}`,
+    typeof c.pct === "number" ? c.pct/100 : "",
+    CATS.map(k=>{ const p = c.catPct?.[k.id]; return `${k.short} ${p==null ? "–" : p+"%"}`; }).join(" | "),
+    verdictFor(c.pct).t, c.id,
+    `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  ];
+}
+async function upsertRows(recs, interactive){
+  await ensureHeaders(interactive);
+  const at = await rowIndex(interactive), data = [], adds = [];
+  recs.forEach(c=>{ const n = at[c.id]; if (n) data.push({range:a1(`A${n}:I${n}`), values:[sheetRow(c)]}); else adds.push(sheetRow(c)); });
+  if (data.length) await sheetsApi("/values:batchUpdate", {method:"POST", body:JSON.stringify({valueInputOption:"RAW", data})}, interactive);
+  if (adds.length) await sheetsApi(`/values/${encodeURIComponent(a1("A:I"))}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+    {method:"POST", body:JSON.stringify({values:adds})}, interactive);
+  return Object.keys(at).length + adds.length;
+}
+async function deleteRows(ids, interactive){
+  const at = await rowIndex(interactive);
+  const rows = ids.map(id=>at[id]).filter(Boolean).sort((x,y)=>y-x);
+  if (rows.length){
+    const gid = await tabGid(interactive);
+    await sheetsApi(":batchUpdate", {method:"POST", body:JSON.stringify({requests:rows.map(n=>({deleteDimension:{range:{sheetId:gid, dimension:"ROWS", startIndex:n-1, endIndex:n}}}))})}, interactive);
+  }
+  return Object.keys(at).length - rows.length;
+}
+function sheetState(text, tone){ const el = $("#sheet-state"); el.className = "mpill " + (tone||""); el.textContent = text; }
+function sheetMessage(err){
+  const c = err?.code, m = String(err?.message || "");
+  if (c === "signin") return "Your Google sign-in has expired. Click Connect Google account, then Send all interviews.";
+  if (c === "auth") return "Google sign-in was cancelled or blocked. Allow pop-ups for this page and try again.";
+  if (c === "gis_load") return "Couldn't load Google sign-in. Check your internet connection.";
+  if (c === "tab" || /parse range/i.test(m)) return `There's no tab named "${sheetCfg.tab}" in this sheet. Tab names are case-sensitive.`;
+  if (c === 403) return "Your Google account can't edit this sheet. Ask the sheet's owner to share it with you as an Editor.";
+  if (c === 404) return "No sheet has that ID. Copy it from the sheet's link, between /d/ and /edit.";
+  if (typeof c === "number") return `Google Sheets refused the request: ${m}`;
+  return "Couldn't reach Google Sheets. Check your connection and try again.";
+}
+// Runs one sheet job; the interview itself is already saved in the scorecard when this runs.
+async function sheetSend(job, done, interactive){
+  try{
+    const rows = await job(interactive);
+    sheetState("Connected", "good");
+    $("#sheet-status").textContent = `Last sent ${new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})} · ${rows} interview row${rows===1?"":"s"} in "${sheetCfg.tab}"`;
+    if (done) toast(done);
+    return true;
+  }catch(err){
+    sheetState(err?.code === "signin" ? "Sign-in needed" : "Not sent", err?.code === "signin" ? "warn" : "bad");
+    $("#sheet-status").textContent = sheetMessage(err);
+    toast("Not sent to the Google Sheet. See the Google Sheet panel on the Candidates tab.", "bad");
+    return false;
+  }
+}
+function readSheetForm(){
+  sheetCfg = {...sheetCfg, sheetId:parseSheetId($("#sheet-id").value), tab:$("#sheet-tab").value.trim(), clientId:$("#sheet-client").value.trim(), auto:$("#sheet-auto").checked};
+  $("#sheet-id").value = sheetCfg.sheetId; lsSet(LS_SHEET, sheetCfg);
+  $("#sheet-link").href = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetCfg.sheetId)}/edit`;
+}
+function initSheet(){
+  $("#sheet-link").href = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetCfg.sheetId)}/edit`;
+  const blocked = sheetBlocked();
+  if (blocked){
+    $("#sheet-controls").hidden = true; $("#sheet-unavailable").hidden = false; sheetState("Unavailable here");
+    $("#sheet-unavailable").textContent = blocked === "claude"
+      ? "This Claude page can't connect to Google. Sending to the sheet works from the GitHub Pages site."
+      : "Google sign-in doesn't work on a page opened from a file. Use the GitHub Pages site, or run a local server (see the README).";
+    return;
+  }
+  $("#sheet-id").value = sheetCfg.sheetId || ""; $("#sheet-tab").value = sheetCfg.tab || ""; $("#sheet-client").value = sheetCfg.clientId || "";
+  $("#sheet-auto").checked = sheetCfg.auto !== false;
+  if (sheetReady()) loadGis().catch(()=>{});
+  $("#sheet-auto").addEventListener("change", ()=>readSheetForm());
+  $("#sheet-save").addEventListener("click", async ()=>{
+    readSheetForm();
+    if (!sheetCfg.sheetId || !sheetCfg.tab){ $("#sheet-status").textContent = "Enter the Sheet ID and the tab name."; return; }
+    if (!sheetReady()){ $("#sheet-status").textContent = "Enter the OAuth Client ID from Google Cloud. It ends in .apps.googleusercontent.com"; return; }
+    gToken = null; $("#sheet-status").textContent = "Waiting for Google sign-in…";
+    await sheetSend(async i=>{ await ensureHeaders(i); return Object.keys(await rowIndex(i)).length; }, "Connected to the Google Sheet.", true);
+  });
+  $("#sheet-sync").addEventListener("click", async ()=>{
+    readSheetForm();
+    if (!sheetReady()){ $("#sheet-status").textContent = "Enter the Sheet ID, tab name and OAuth Client ID, then connect."; return; }
+    if (!candidates.length){ $("#sheet-status").textContent = "There are no saved interviews to send."; return; }
+    const b = $("#sheet-sync"); b.disabled = true; $("#sheet-status").textContent = `Sending ${candidates.length} interviews…`;
+    await sheetSend(i=>upsertRows(candidates, i), `Sent ${candidates.length} interview${candidates.length===1?"":"s"} to the Google Sheet.`, true);
+    b.disabled = false;
+  });
+}
+
 /* ---------- boot ---------- */
+initSheet();
+$("#tick-next").setAttribute("transform", `rotate(${THRESHOLDS.next*3.6} 88 88)`);
+$("#tick-rec").setAttribute("transform", `rotate(${THRESHOLDS.rec*3.6} 88 88)`);
+$("#tick-note").textContent = `${THRESHOLDS.next}% (next round) and ${THRESHOLDS.rec}% (recommended)`;
 build();
 const draft = lsGet(LS_DRAFT);
 if (draft && draft.id && draft.scores){ cur = {...blank(), ...draft}; dirty = Object.keys(draft.scores).length > 0; }
