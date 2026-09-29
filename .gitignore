@@ -1,0 +1,13 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
+
+# Local exports and backups
+support-trainee-interviews-*.csv
+support-trainee-backup-*.json

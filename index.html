@@ -1,4 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Support Trainee Scorecard</title>
+<meta name="description" content="Score Technical Support Trainee interviews across 52 questions in 7 sections, with live totals, a section radar, focus mode, keyboard scoring and a candidate dashboard.">
+<meta name="theme-color" content="#0F2438">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='8' fill='%230A7680'/%3E%3Cpath d='M8 15a6 6 0 0 1 12 0v3a2 2 0 0 1-2 2h-1v-6h3M8 14h3v6h-1a2 2 0 0 1-2-2z' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -36,6 +44,8 @@
   --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
 body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);margin:0}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:20px 80px}
 @media (max-width:520px){.wrap{padding-inline:16px}}
@@ -270,7 +280,8 @@ tbody tr.row.open{background:var(--accent-soft)}
 @keyframes toast{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
@@ -390,7 +401,9 @@ tbody tr.row.open{background:var(--accent-soft)}
         <select class="sel" id="q-sort" aria-label="Sort">
           <option value="date">Newest first</option><option value="score">Highest score</option><option value="name">Name A–Z</option>
         </select>
-        <button class="btn" id="btn-csv" hidden>Export CSV</button>
+        <button class="btn" id="btn-csv">Export CSV</button>
+        <button class="btn" id="btn-backup" hidden>Back up (JSON)</button>
+        <label class="btn" id="btn-restore" hidden style="cursor:pointer">Restore<input type="file" id="f-restore" accept=".json,application/json" hidden></label>
       </div>
     </div>
     <div class="tablebox">
@@ -850,8 +863,40 @@ $("#btn-csv").addEventListener("click", async ()=>{
   const cell = v => { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
   const rows = candidates.map(c=>[c.name,c.date,c.interviewer,c.mode,c.shift,c.earned,c.max,c.pct,c.verdict,...CATS.map(k=>c.catPct?.[k.id] ?? ""),...Q.map(q=>c.scores?.[q.key] ?? ""),c.remarks]);
   const csv = [head,...rows].map(r=>r.map(cell).join(",")).join("\r\n");
-  try{ await downloads.save({filename:`support-trainee-interviews-${today()}.csv`, data:"﻿"+csv}); toast("CSV exported."); }
-  catch(err){ if (err?.code !== "declined") toast("Export isn't available here.", "bad"); }
+  await saveFile(`support-trainee-interviews-${today()}.csv`, "﻿"+csv, "text/csv;charset=utf-8", "CSV exported.");
+});
+
+/* Offers a file: through the Claude viewer when hosted there, otherwise a normal browser download. */
+async function saveFile(filename, data, type, done){
+  if (downloads){
+    try{ await downloads.save({filename, data}); toast(done); }
+    catch(err){ if (err?.code !== "declined") toast("Export isn't available here.", "bad"); }
+    return;
+  }
+  if (window.claude?.use){ toast("Export isn't available here.", "bad"); return; }
+  const url = URL.createObjectURL(new Blob([data], {type}));
+  const a = Object.assign(document.createElement("a"), {href:url, download:filename});
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000); toast(done);
+}
+
+/* Backup and restore apply only to browser storage (standalone use). */
+$("#btn-backup").addEventListener("click", ()=>{
+  saveFile(`support-trainee-backup-${today()}.json`, JSON.stringify({app:"support-trainee-scorecard", version:1, candidates}, null, 2), "application/json", "Backup saved.");
+});
+$("#f-restore").addEventListener("change", async e=>{
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file) return;
+  try{
+    const data = JSON.parse(await file.text());
+    const incoming = Array.isArray(data) ? data : data.candidates;
+    if (!Array.isArray(incoming)) throw new Error("shape");
+    const valid = incoming.filter(c=>c && typeof c.id === "string" && typeof c.name === "string" && c.scores && typeof c.scores === "object");
+    const byId = Object.fromEntries(candidates.map(c=>[c.id,c]));
+    valid.forEach(c=>{ byId[c.id] = c; });
+    candidates = Object.values(byId); lsSet(LS_LIST, candidates); renderDash();
+    toast(`Restored ${valid.length} interview${valid.length===1?"":"s"}.`);
+  }catch{ toast("That file isn't a scorecard backup. Choose a .json file made with Back up.", "bad"); }
 });
 
 /* ---------- boot ---------- */
@@ -861,10 +906,12 @@ if (draft && draft.id && draft.scores){ cur = {...blank(), ...draft}; dirty = Ob
 fillForm();
 candidates = lsGet(LS_LIST) || [];
 renderDash();
-$("#store-note").textContent = "Interviews are saved in this browser only.";
+$("#store-note").textContent = "Interviews are saved in this browser only. Use Back up to keep a copy or move them to another computer.";
+const standalone = !window.claude?.use;
+$("#btn-backup").hidden = $("#btn-restore").hidden = !standalone;
 
 (async ()=>{
-  if (!window.claude?.use) return;
+  if (standalone) return;
   try { downloads = await window.claude.use("downloads"); } catch { downloads = null; }
   $("#btn-csv").hidden = !downloads;
   try { db = await window.claude.use("db"); } catch { db = null; }
@@ -876,3 +923,5 @@ $("#store-note").textContent = "Interviews are saved in this browser only.";
   }, ()=>{ $("#store-note").textContent = "Live updates stopped. Reload the page to reconnect."; });
 })();
 </script>
+</body>
+</html>
